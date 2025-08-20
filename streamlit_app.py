@@ -5,6 +5,15 @@ from PIL import Image
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title="엘니뇨 & 라니냐 학습 앱", layout="wide")
+st.set_page_config(page_title="엘니뇨 & 라니냐 학습 앱", layout="wide")
+
+# ✅ 본문 폭 넓히고, iFrame이 컨테이너 안에서 가로를 꽉 채우도록
+st.markdown("""
+<style>
+.block-container { max-width: 1200px !important; }   /* 본문 최대폭 늘리기 */
+[data-testid="stIFrame"] { width: 100% !important; } /* iFrame 가로 꽉 채우기 */
+</style>
+""", unsafe_allow_html=True)
 st.title("🌊 엘니뇨 & 라니냐 시각화 학습 앱")
 
 # 사이드바 메뉴
@@ -47,8 +56,9 @@ elif menu == "시뮬레이션 보기":
 
     html_code = """
 <!-- ▼ 큰 드롭다운 UI: 캔버스 위, 가운데 정렬 -->
-<div style="width:700px;margin:8px auto 10px auto;display:flex;justify-content:center;position:relative;">
-  <!-- 선택 박스 -->
+<div style="width:700px; margin:8px auto 10px auto; text-align:center; position:relative;">
+
+  <!-- 드롭다운 박스 -->
   <select id="modeSelect"
     style="
       width: 360px;
@@ -62,34 +72,35 @@ elif menu == "시뮬레이션 보기":
       border: 2px solid #2a4a7f;
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-      padding: 0 64px 0 24px;   /* 우측에 ▼ 공간 */
-      appearance: none;         /* 기본 화살표 제거 (브라우저별) */
+      padding: 0 64px 0 24px;
+      appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
       outline: none;
       cursor: pointer;
+      margin-bottom: 12px;  /* 캔버스와 간격 */
     ">
     <option value="엘니뇨">엘니뇨</option>
-    <option value="평상시" selected>평상시</option>
-    <option value="라니냐">라니냐</option>
+    <option value="평상시">평상시</option>
+    <option value="라니냐" selected>라니냐</option>
   </select>
 
-  <!-- 오른쪽 파란 ▼ 아이콘 (select 위에 겹쳐 배치) -->
+  <!-- 파란 ▼ 아이콘 (select 위에 겹침) -->
   <div style="
       position:absolute;
-      right: calc( (700px - 360px) / 2 + 16px );  /* 컨테이너 우측 여백 + 삼각형 여백 */
-      top: 50%;
-      transform: translateY(-50%);
-      width: 0; height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 20px solid #3a66b7;  /* 파란 삼각형 */
-      pointer-events: none;            /* 클릭 방해 X */
+      right:170px; /* 드롭다운 오른쪽 정렬 */
+      top:28px;
+      width:0; height:0;
+      border-left:14px solid transparent;
+      border-right:14px solid transparent;
+      border-top:20px solid #3a66b7;
+      pointer-events:none;
     ">
   </div>
-</div>
 
-<canvas id="myCanvas" width="700" height="450" style="border:1px solid #ccc;"></canvas>
+  <!-- 캔버스 -->
+  <canvas id="myCanvas" width="700" height="430" style="border:1px solid #ccc;"></canvas>
+</div>
 
 <script>
 const canvas = document.getElementById("myCanvas");
@@ -495,7 +506,7 @@ function animateWalker() {
 animateWalker();
 </script>
 """
-    components.html(html_code, height=500)
+    components.html(html_code, height=520, width=900)
 
 # ----------------------
 # 3. 실제 데이터 비교
