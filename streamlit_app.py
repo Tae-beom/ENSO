@@ -61,7 +61,7 @@ elif menu == "시뮬레이션 보기":
   <!-- 드롭다운 박스 -->
   <select id="modeSelect"
     style="
-      width: 360px;
+      width: 350px;
       height: 54px;
       font-family: Arial;
       font-size: 28px;
@@ -81,15 +81,15 @@ elif menu == "시뮬레이션 보기":
       margin-bottom: 12px;  /* 캔버스와 간격 */
     ">
     <option value="엘니뇨">엘니뇨</option>
-    <option value="평상시">평상시</option>
-    <option value="라니냐" selected>라니냐</option>
+    <option value="평상시" selected>평상시</option>
+    <option value="라니냐">라니냐</option>
   </select>
 
   <!-- 파란 ▼ 아이콘 (select 위에 겹침) -->
   <div style="
       position:absolute;
-      right:170px; /* 드롭다운 오른쪽 정렬 */
-      top:28px;
+      right:190px; /* 드롭다운 오른쪽 정렬 */
+      top:17px;
       width:0; height:0;
       border-left:14px solid transparent;
       border-right:14px solid transparent;
