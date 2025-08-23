@@ -1,60 +1,16 @@
+## pages/2\_🧪\_시뮬레이션\_보기.py
+
+# -*- coding: utf-8 -*-
 import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-from PIL import Image
 import streamlit.components.v1 as components
+from utils import inject_css
 
-st.set_page_config(page_title="엘니뇨 & 라니냐 학습 앱", layout="wide")
-st.set_page_config(page_title="엘니뇨 & 라니냐 학습 앱", layout="wide")
+inject_css(max_width_px=1200)
 
-# ✅ 본문 폭 넓히고, iFrame이 컨테이너 안에서 가로를 꽉 채우도록
-st.markdown("""
-<style>
-.block-container { max-width: 1200px !important; }   /* 본문 최대폭 늘리기 */
-[data-testid="stIFrame"] { width: 100% !important; } /* iFrame 가로 꽉 채우기 */
-</style>
-""", unsafe_allow_html=True)
-st.title("🌊 엘니뇨 & 라니냐 시각화 학습 앱")
+st.header("🌐 적도 태평양 대기와 해양의 상태 변화")
 
-# 사이드바 메뉴
-menu = st.sidebar.radio("메뉴 선택", ["개요 보기", "시뮬레이션 보기", "실제 데이터 비교"])
-
-# ----------------------
-# 1. 개요 보기
-# ----------------------
-if menu == "개요 보기":
-    st.header("✅ 엘니뇨와 라니냐란?")
-
-    st.subheader("엘니뇨")
-    st.markdown("""
-    - 엘니뇨는 **동태평양의 해수면 온도**가 **평년보다 높아지는 현상**입니다.
-    - **무역풍**이 **약**해지면서 따뜻한 해수가 동쪽으로 이동하고, 이는 전 지구적인 기후 변화로 이어집니다.
-    
-    예시: 남미에 폭우, 동남아시아에 가뭄
-    """)
-
-    st.subheader("라니냐")
-    st.markdown("""
-    - 라니냐는 **동태평양의 해수면 온도**가 **평년보다 낮아지는 현상**입니다.
-    - **무역풍**이 **강**해져서 서쪽으로 따뜻한 물을 몰아내고, 동쪽에는 찬 물이 솟아오릅니다.
-    
-    예시: 인도네시아/호주에 폭우, 남미에 가뭄
-    """)
-
-    # 이미지 출력 (정상적으로 불러오는 코드)
-    try:
-        image = Image.open("images/elninolanina.png")
-        st.image(image, caption="엘니뇨 & 라니냐 개념도", use_container_width=True)
-    except Exception as e:
-        st.error("이미지를 불러올 수 없습니다. images/elninolanina.png 경로를 확인하세요.")
-
-# ----------------------
-# 2. 시뮬레이션 보기  ← 여기 전부 교체
-# ----------------------
-elif menu == "시뮬레이션 보기":
-    st.header("🌐 ENSO 시뮬레이션")
-
-    html_code = """
+# 원본 HTML/JS 시뮬레이션 그대로 포함
+html_code = """
 <!-- ▼ 큰 드롭다운 UI: 캔버스 위, 가운데 정렬 -->
 <div style="width:700px; margin:8px auto 10px auto; text-align:center; position:relative;">
 
@@ -240,14 +196,6 @@ function updateAndDrawRain() {
    ========================= */
 function getModeParams(mode) {
   if (mode === "엘니뇨") {
-    /* 엘니뇨:
-       1) 용승 약화 → 화살표 머리(끝) 아래쪽(큰 y)으로, 꼬리 위치는 그대로
-       2) 수온약층 기울기 축소 + 반대로 약간 기울임(서쪽 얕고, 동쪽 깊음)
-       3) 동쪽 수온약층 깊이와 용승 화살표 머리 y를 일치시킴
-       4) SST 띠: 서쪽 파랑(음), 중앙 밝은회색, 동쪽 빨강(양)
-       6) 워커 순환 반시계(동쪽 상승, 서쪽 하강), 크기 70%
-       7) 구름 위치: 동태평양 쪽
-    */
     const westY = 240;   // 수온약층(서쪽) y
     const eastY = 270;   // 수온약층(동쪽) y — 평상시보다 더 깊음(큰 y)
     const upwellTail = { x: 660, y: 300 }; // 꼬리(고정)
@@ -255,42 +203,30 @@ function getModeParams(mode) {
 
     return {
       thermo: { west: {x:0, y:westY}, east: {x:700, y:eastY} },
-      // SST 띠 그라데이션(엘니뇨: 파랑-회색-빨강)
       sstStops: [
         {pos:0.0, color:"blue"},
         {pos:0.4, color:"#f5f5f5"},
         {pos:0.6, color:"#f5f5f5"},
         {pos:1.0, color:"red"},
       ],
-      // 용승 화살표(동쪽): 꼬리 고정, 머리는 수온약층 y까지 낮춤(약화)
       upwelling: { tailX: upwellTail.x, tailY: upwellTail.y, headY: upwellHeadY, color:"#003366" },
-      // 구름/비 위치(동쪽으로 이동)
       cloudX: 600, cloudY: 60,
-      // 워커 순환(반시계: 동쪽 상승 → 상층 서쪽 → 서쪽 하강 → 표면 동쪽)
       walkerPoints: [
-        { x: 600, y: 70 },  // 동쪽 상승 시작
-        { x: 600, y: 30 },  // 상층 도달
-        { x: 100, y: 30 },  // 상층 동→서
-        { x: 100, y: 70 },  // 서쪽 하강 상단
-        { x: 100, y: 110 }, // 하강 중간
-        { x: 100, y: 115 }, // 표면 도달
-        { x: 600, y: 115 }, // 표면 서→동(글씨 위)
-        { x: 600, y: 110 }  // 상승 전환
+        { x: 600, y: 70 },
+        { x: 600, y: 30 },
+        { x: 100, y: 30 },
+        { x: 100, y: 70 },
+        { x: 100, y: 110 },
+        { x: 100, y: 115 },
+        { x: 600, y: 115 },
+        { x: 600, y: 110 }
       ],
-      walkerScale: 0.7,           // 길이 70%
-      walkerLineWidth: 2.2        // 두께도 약간 얇게(선택)
+      walkerScale: 0.7,
+      walkerLineWidth: 2.2
     };
   }
 
   if (mode === "라니냐") {
-    /* 라니냐(요구사항 반영):
-       1) 용승 강화 → 화살표 머리가 표층 근처까지 ↑ (y 값 작게, 예: 170)
-       2) 수온약층 경사 심화 → 서쪽 더 깊게(y↑=310), 동쪽 더 얕게(y↓=160)
-       3) 워커 순환 강화 → 화살표 길이 1.25배, 두께↑
-       4) 수온 편차 더 심함 → 중앙 연회색 띠를 서쪽으로 치우침(0.32~0.48),
-          양 끝단(서/동)은 더욱 진하게 보이도록 끝단 대비 강화
-       ※ 구름: 평상시처럼 서태평양에 유지
-    */
     const westY = 310;      // 서쪽 수온약층 y (평상시 300보다 더 깊게)
     const eastY = 160;      // 동쪽 수온약층 y (평상시 200보다 더 얕게)
     const upwellTail = { x: 660, y: 300 }; // 꼬리(고정, 평상시와 동일)
@@ -298,18 +234,14 @@ function getModeParams(mode) {
 
     return {
       thermo: { west: {x:0, y:westY}, east: {x:700, y:eastY} },
-      // SST 띠 그라데이션(라니냐: 빨강-연회색(서쪽으로 치우침)-파랑, 대비 강화)
       sstStops: [
-        {pos:0.0, color:"red"},      // 서쪽 끝 더 따뜻(진하게)
-        {pos:0.32, color:"#f5f5f5"}, // 중앙 연회색 시작 → 서쪽으로 당김
-        {pos:0.48, color:"#f5f5f5"}, // 중앙 연회색 끝
-        {pos:1.0, color:"blue"}      // 동쪽 끝 더 차갑게(진하게)
+        {pos:0.0, color:"red"},
+        {pos:0.32, color:"#f5f5f5"},
+        {pos:0.48, color:"#f5f5f5"},
+        {pos:1.0, color:"blue"}
       ],
-      // 용승 화살표(동쪽): 강화 → 머리 y를 170까지 올림
       upwelling: { tailX: upwellTail.x, tailY: upwellTail.y, headY: upwellHeadY, color:"#003366" },
-      // 구름/비 위치: 평상시와 동일(서태평양 쪽)
       cloudX: 95, cloudY: 45,
-      // 워커 순환(강화: 경로는 평상시와 동일, 길이/두께만 강화)
       walkerPoints: [
         { x: 100, y: 70 },
         { x: 100, y: 30 },
@@ -320,12 +252,12 @@ function getModeParams(mode) {
         { x: 100, y: 115 },
         { x: 100, y: 110 }
       ],
-      walkerScale: 1.25,         // ★ 길이 1.25배
-      walkerLineWidth: 4          // ★ 두께 증가
+      walkerScale: 1.25,
+      walkerLineWidth: 4
     };
   }
 
-  // 기본(평상시) 파라미터 — 네가 쓰던 그림 값 그대로
+  // 기본(평상시)
   return {
     thermo: { west: {x:0, y:300}, east: {x:700, y:200} },
     sstStops: [
@@ -335,7 +267,7 @@ function getModeParams(mode) {
       {pos:1.0, color:"blue"},
     ],
     upwelling: { tailX: 660, tailY: 300, headY: 210, color:"#003366" },
-    cloudX: 95, cloudY: 45,   // 서태평양 쪽
+    cloudX: 95, cloudY: 45,
     walkerPoints: [
       { x: 100, y: 70 },
       { x: 100, y: 30 },
@@ -373,6 +305,12 @@ function drawBase(){
   ctx.textAlign = "center";
   ctx.fillText("표층 해수", 350, 150);
 
+    // 워커 순환 텍스트
+  ctx.font = "14px Arial";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.fillText("워커 순환", 350, 80);
+
   // Thermocline (수온약층) — 모드별 선분 사용
   ctx.beginPath();
   ctx.moveTo(P.thermo.west.x, P.thermo.west.y);
@@ -404,7 +342,7 @@ function drawBase(){
   ctx.textAlign = "center";
   ctx.fillText("용승", P.upwelling.tailX, P.upwelling.tailY + 20);
 
-  // 범례 (작은 그라데이션: 모드와 무관 — 필요시 모드별로 바꿔도 됨)
+  // 범례 (작은 그라데이션)
   let legendY = 360;
   let legendGrad = ctx.createLinearGradient(620, legendY, 680, legendY);
   legendGrad.addColorStop(0, "red");
@@ -419,7 +357,7 @@ function drawBase(){
   ctx.fillText("-", 680, legendY - 5);
   ctx.fillText("수온 편차", 650, legendY + 25);
 
-  // 경도 라벨 (기존 y=410 유지)
+  // 경도 라벨
   ctx.font = "12px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
@@ -433,10 +371,10 @@ function drawBase(){
    워커 순환 애니메이션
    ========================= */
 let walkerT = 0;
-const walkerStep = 2;           // 프레임당 진행량 (속도 미세조절)
-const cycle = 700;              // 한 바퀴 도는 프레임 수
-let arrowColor = "#808080";     // 회색 바람 화살표
-const baseArrowLenPx = 64;      // 평상시 화살표 길이(px)
+const walkerStep = 2;
+const cycle = 700;
+let arrowColor = "#808080";
+const baseArrowLenPx = 64;
 
 // 최초 1회: 평상시 구름 위치로 비 초기화
 initRain(cloudX, cloudY);
@@ -463,7 +401,7 @@ function animateWalker() {
   // 워커 순환 경로(모드별) + 크기/두께 스케일
   const points = P.walkerPoints;
   const arrowLenPx = baseArrowLenPx * (P.walkerScale ?? 1.0);
-  const walkerLineW = (P.walkerLineWidth ?? 3); // ★ 두께
+  const walkerLineW = (P.walkerLineWidth ?? 3);
 
   // 총 길이 계산
   let totalLength = 0;
@@ -506,12 +444,5 @@ function animateWalker() {
 animateWalker();
 </script>
 """
-    components.html(html_code, height=520, width=900)
 
-# ----------------------
-# 3. 실제 데이터 비교
-# ----------------------
-elif menu == "실제 데이터 비교":
-    st.header("📊 ENSO 지수 (ONI) 분석")
-
-    st.warning("이 섹션은 구현 준비 중입니다. NOAA 데이터 연동 예정입니다.")
+components.html(html_code, height=520, width=900)
