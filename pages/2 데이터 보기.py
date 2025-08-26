@@ -221,8 +221,8 @@ def load_index(index_name: str):
             df = wide.dropna(subset=["YearMonth","VALUE"]).sort_values("YearMonth").reset_index(drop=True)
         thr = 1.0
         def classify(v):
-            if v >= thr: return "양의 편차 ⇒ 라니냐", "blue"
-            if v <= -thr: return "음의 편차 ⇒ 엘니뇨", "red"
+            if v >= thr: return "라니냐", "blue"
+            if v <= -thr: return "엘니뇨", "red"
             return "중립", "black"
         df["상태"], df["색"] = zip(*df["VALUE"].apply(classify))
         meta = dict(title="OLR", yaxis="OLR (anomaly)")
@@ -346,7 +346,7 @@ html = f"""
     info.innerHTML = "📅 " + year + "년 " + String(parseInt(month)) + "월 "
                    + "{meta['title']}: "
                    + "<span style='color:" + color + "'><b>" + valStr + "</b></span>"
-                   + " → " + stateHtml;
+                   + " ⇒ " + stateHtml;
   }}
 
   function syncSliderToPlot() {{
